@@ -1,9 +1,13 @@
 require "clamp"
 require "reaper/anime"
 require "reaper/download"
+require "reaper/index_command"
 
 SITE = "http://www.animecrazy.net/"
 class Reaper < Clamp::Command
+
+  subcommand "index", "List names of anime", IndexCommand
+
   subcommand "info", "Print information about given anime" do
     parameter "ANIME", "Name of anime to retrieve info about" do |name|
       Anime.new name if name
