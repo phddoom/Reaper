@@ -47,36 +47,6 @@ class Download
     end
     download_page = agent.get @download_service_url
     puts download_page.uri
-    case download_page.uri.to_s
-    when /megaupload/i
-      download_from_megaupload download_page, agent
-    when /mediafire/i
-      download_from_mediafire download_page, agent
-    else
-      puts "Cannot download from that provider"
-    end
-  end
-
-  def download_from_megaupload download_page, agent
-    megaupload_link = download_page.link_with(:href => /files/)
-    puts megaupload_link.href
-    puts "Getting Response ..."
-    episode = agent.get URI.encode(megaupload_link.href, /\[|\]/)
-    puts "Done"
-    puts "Saving File to Disk ..."
-    episode.save_as ""+ megaupload_link.href.split("/").last
-    puts "Done"
-    puts "Exiting"
-  end
-
-  def download_from_mediafire download_page, agent
-    mediafire_link = download_page.uri.to_s + "/autodisable.php/" + download_page.title.to_s.gsub(" ", "+")
-    puts mediafire_link
-    puts "Getting Response ..."
-    episode = agent.get URI.encode(mediafire_link, /\[|\]/)
-    puts "Done"
-    puts "Saving File to Disk ..."
-    episode.save_as "" + mediafire_link.split("/").last
   end
 
   def regex_or_user_input dls

@@ -2,23 +2,14 @@ require "clamp"
 require "reaper/anime"
 require "reaper/download"
 require "reaper/index_command"
+require "reaper/info_command"
 
 SITE = "http://www.animecrazy.net/"
 class Reaper < Clamp::Command
 
   subcommand "index", "List names of anime", IndexCommand
 
-  subcommand "info", "Print information about given anime" do
-    parameter "ANIME", "Name of anime to retrieve info about" do |name|
-      Anime.new name if name
-  end
-
-    def execute
-      puts "Name: " + anime.name
-      puts "# of eps: " + anime.number_of_episodes.to_s
-      puts "Desc: " + anime.desc
-    end
-  end
+  subcommand "info", "Print information about given anime", InfoCommand
 
   subcommand "download", "Download Anime" do
     parameter "[ANIME]", "Name of Anime to download" do |name|

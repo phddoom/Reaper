@@ -1,5 +1,5 @@
 #! /usr/bin/env ruby
 
-require 'lib/reaper/reaper'
+require 'reaper/reaper'
 
 Reaper.run
