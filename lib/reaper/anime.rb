@@ -1,6 +1,7 @@
 require "mechanize"
 
 class Anime
+
   attr_reader :name, :desc, :number_of_episodes
 
   def initialize name, number_of_episodes = nil, desc = nil

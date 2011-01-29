@@ -21,4 +21,5 @@ Gem::Specification.new do |s|
 
   s.add_dependency "mechanize"
   s.add_dependency "clamp"
+  s.add_dependency "require_all"
 end
