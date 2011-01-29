@@ -1,6 +1,10 @@
 require "mechanize"
+require "require_all"
+require_rel "providers"
 
 class Anime
+
+  include Animecrazy
 
   attr_reader :name, :desc, :number_of_episodes
 
@@ -17,18 +21,21 @@ class Anime
   private
 
   def get_number_of_episodes
-    agent = Mechanize.new
-    url = SITE + "/#{@name.gsub(" ", "-") + "-anime"}"
-    anime_page = agent.get url
-    anime_page.search(".epCount p").first.text =~ /Episodes: (\d*)/
-    $1.to_i
+    providers = self.class.ancestors - Object.ancestors - [self.class]
+    eps = 0
+    providers.each do |provider|
+      eps =self.send("get_number_of_episodes_from_#{provider.to_s.downcase}")
+    end
+    eps
   end
 
   def get_desc
-    agent = Mechanize.new
-    url = SITE + "/#{@name.gsub(" ", "-") + "-anime"}"
-    anime_page = agent.get url
-    anime_page.search(".desc").text.gsub("Description:", "").strip
+    providers = self.class.ancestors - Object.ancestors - [self.class]
+    desc = ""
+    providers.each do |provider|
+      desc = self.send("get_description_from_#{provider.to_s.downcase}")
+    end
+    desc
   end
 
 end
