@@ -3,10 +3,11 @@ require "mechanize"
 class Download
   attr_reader :anime, :type, :ep
 
-  def initialize anime, ep = nil, link_regex = nil
+  def initialize anime, ep = nil, link_regex = nil, downloader = nil
     @anime = anime
     @ep = ep
     @link_regex = link_regex
+    @downloader = downloader
     @type = case ep
             when Array, Range
               :multi
@@ -46,7 +47,12 @@ class Download
       a.follow_meta_refresh = true
     end
     download_page = agent.get @download_service_url
-    puts download_page.uri
+    if @downloader
+      puts "Hand link(s) to downloader"
+      puts "This could be handled similar to providers"
+    else
+      puts download_page.uri
+    end
   end
 
   def regex_or_user_input dls

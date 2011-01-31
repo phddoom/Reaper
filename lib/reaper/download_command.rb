@@ -42,8 +42,10 @@ class DownloadCommand < Clamp::Command
     Regexp.new regex
   end
 
+  parameter "[DOWNLOADER]", "Specify downloader to send links to"
+
   def execute
-    download = Download.new anime, episodes, regex
+    download = Download.new anime, episodes, regex, downloader
     download.reap
   end
 end
