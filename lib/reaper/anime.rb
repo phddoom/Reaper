@@ -4,7 +4,7 @@ require_rel "providers"
 
 class Anime
 
-  include Animecrazy
+  include Animecrazy::Anime
 
   attr_reader :name, :desc, :number_of_episodes
 
@@ -21,7 +21,7 @@ class Anime
   private
 
   def get_number_of_episodes
-    providers = self.class.ancestors - Object.ancestors - [self.class]
+    providers = (self.class.included_modules - Object.ancestors).map{|p| p.to_s.split("::").first}
     eps = 0
     providers.each do |provider|
       eps =self.send("get_number_of_episodes_from_#{provider.to_s.downcase}")
@@ -30,7 +30,7 @@ class Anime
   end
 
   def get_desc
-    providers = self.class.ancestors - Object.ancestors - [self.class]
+    providers = (self.class.included_modules - Object.ancestors).map{|p| p.to_s.split("::").first}
     desc = ""
     providers.each do |provider|
       desc = self.send("get_description_from_#{provider.to_s.downcase}")
