@@ -1,7 +1,10 @@
 require "mechanize"
 
 class Download
+
   attr_reader :anime, :type, :ep
+
+  include Animecrazy::Download
 
   def initialize anime, ep = nil, link_regex = nil, downloader = nil
     @anime = anime
@@ -32,26 +35,18 @@ class Download
   end
 
   def stage ep
-    agent = Mechanize.new
-    url = SITE + "/#{@anime.name_url + "-episode"}-#{ep}/"
-    episode_page = agent.get url
-    download_links = episode_page.links_with(:text => /download/i)
-    download_links.delete_if{|link| link.text =~ /broken|\+/i}
-    download_link = regex_or_user_input download_links
-    download_link.attributes[:onclick] =~ /download\/(\d*)/
-    @download_service_url = "http://www.animecrazy.net/mirrordownload/" + $1
+    providers = (self.class.included_modules - Object.ancestors).map{|p| p.to_s.split("::").first}
+    providers.each do |provider|
+      self.send("stage_from_#{provider.to_s.downcase}", ep)
+    end
   end
 
   def download
-    agent = Mechanize.new do |a|
-      a.follow_meta_refresh = true
-    end
-    download_page = agent.get @download_service_url
     if @downloader
       puts "Hand link(s) to downloader"
       puts "This could be handled similar to providers"
     else
-      puts download_page.uri
+     puts @download_url
     end
   end
 
