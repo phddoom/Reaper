@@ -29,9 +29,9 @@ class InfoCommand < Clamp::Command
   end
 
   def execute
-    puts "Name: " + anime.name
-    puts "# of eps: " + anime.number_of_episodes.to_s
-    puts "Desc: " + anime.desc
+    puts "Name: #{anime.name}"
+    puts "# of eps: #{anime.number_of_episodes.to_s}"
+    puts "Desc: \n\t#{anime.desc.join("\n\t")}"
   end
 
 end

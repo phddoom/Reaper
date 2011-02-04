@@ -30,7 +30,7 @@ module Animecrazy
       uls.each do |ul|
         lis = ul.search("li")
         lis.each do |li|
-          animecrazy_index << li.text if (!query || li.text.include?(query)) && (!type || li.text.include?(type))
+          animecrazy_index << li.text if (!query || li.text.downcase.include?(query.downcase)) && (!type || li.text.include?(type))
         end
       end
       animecrazy_index

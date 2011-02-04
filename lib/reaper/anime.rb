@@ -5,17 +5,22 @@ require_rel "providers"
 class Anime
 
   include Animecrazy::Anime
+  include Animea::Anime
 
   attr_reader :name, :desc, :number_of_episodes
 
   def initialize name, number_of_episodes = nil, desc = nil
     @name = name
-    @number_of_episodes = number_of_episodes || get_number_of_episodes
     @desc = desc || get_desc
+    @number_of_episodes = number_of_episodes || get_number_of_episodes
   end
 
   def name_url
     @name.gsub(" ", "-")
+  end
+
+  def to_yaml_properties
+    %w{ @name @desc @number_of_episodes }
   end
 
   private
@@ -24,16 +29,17 @@ class Anime
     providers = (self.class.included_modules - Object.ancestors).map{|p| p.to_s.split("::").first}
     eps = 0
     providers.each do |provider|
-      eps =self.send("get_number_of_episodes_from_#{provider.to_s.downcase}")
+      new_eps = self.send("get_number_of_episodes_from_#{provider.to_s.downcase}")
+      eps = new_eps if new_eps && new_eps > eps
     end
     eps
   end
 
   def get_desc
     providers = (self.class.included_modules - Object.ancestors).map{|p| p.to_s.split("::").first}
-    desc = ""
+    desc = []
     providers.each do |provider|
-      desc = self.send("get_description_from_#{provider.to_s.downcase}")
+      desc << "#{provider.upcase}: " + self.send("get_description_from_#{provider.to_s.downcase}").gsub(/(\.|\!|\?) /, "#{$1}\n\t\t")
     end
     desc
   end
