@@ -2,7 +2,19 @@ module Animea
 
   SITE = "http://www.animea.net/"
 
+  module Download
+    def stage_from_animea ep
+      agent = Mechanize.new
+      links_page = @anime.animea_series_page.link_with(:text => /#{ep }/).click
+      download_link = regex_or_user_input links_page.links_with(:text => /\.com/)
+      @download_url = download_link.uri.to_s
+    end
+  end
+
   module Anime
+
+    attr_reader :animea_series_page
+
     private
 
     def get_animea_series_page

@@ -1,10 +1,13 @@
 require "mechanize"
+require "require_all"
+require_rel "providers"
 
 class Download
 
   attr_reader :anime, :type, :ep
 
   include Animecrazy::Download
+  include Animea::Download
 
   def initialize anime, ep = nil, link_regex = nil, downloader = nil
     @anime = anime
@@ -24,11 +27,19 @@ class Download
     when :multi
       @ep.each do |ep|
         self.stage ep
-        self.download
+        if @download_url
+          self.download
+        else
+          puts "No download url found"
+        end
       end
     when :single
       self.stage @ep
-      self.download
+      if @download_url
+        self.download
+      else
+        puts "No download url found"
+      end
     else
       raise "Bad download type"
     end
@@ -37,7 +48,11 @@ class Download
   def stage ep
     providers = (self.class.included_modules - Object.ancestors).map{|p| p.to_s.split("::").first}
     providers.each do |provider|
-      self.send("stage_from_#{provider.to_s.downcase}", ep)
+      begin
+        self.send("stage_from_#{provider.to_s.downcase}", ep)
+      rescue
+        puts "FAIL #{provider}"
+      end
     end
   end
 
@@ -51,7 +66,7 @@ class Download
   end
 
   def regex_or_user_input dls
-    unless @link_regex.nil?
+    if @link_regex
       regex_links = dls.select{|link| link.text =~ @link_regex}
       case regex_links.size
       when 0
@@ -70,8 +85,10 @@ class Download
     dls.each_with_index do |link, index|
       puts index.to_s + "\t" + link.text.strip
     end
+    puts "Enter n to go to next provider if any."
     puts "Enter number of download link to use: "
     choice = STDIN.gets
+    return if choice.strip.downcase == "n"
     dls[choice.to_i]
   end
 

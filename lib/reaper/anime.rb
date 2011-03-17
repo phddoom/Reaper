@@ -29,7 +29,11 @@ class Anime
     providers = (self.class.included_modules - Object.ancestors).map{|p| p.to_s.split("::").first}
     eps = 0
     providers.each do |provider|
-      new_eps = self.send("get_number_of_episodes_from_#{provider.to_s.downcase}")
+      begin
+        new_eps = self.send("get_number_of_episodes_from_#{provider.to_s.downcase}")
+      rescue
+        new_eps = 0
+      end
       eps = new_eps if new_eps && new_eps > eps
     end
     eps
@@ -39,7 +43,10 @@ class Anime
     providers = (self.class.included_modules - Object.ancestors).map{|p| p.to_s.split("::").first}
     desc = []
     providers.each do |provider|
-      desc << "#{provider.upcase}: " + self.send("get_description_from_#{provider.to_s.downcase}").gsub(/(\.|\!|\?) /, "#{$1}\n\t\t")
+      begin
+        desc << "#{provider.upcase}: " + self.send("get_description_from_#{provider.to_s.downcase}").gsub(/(\.|\!|\?) /, "#{$1}\n\t\t")
+      rescue
+      end
     end
     desc
   end
