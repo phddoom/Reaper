@@ -4,7 +4,7 @@ require_rel "providers"
 
 class Download
 
-  attr_reader :anime, :type, :ep
+  attr_reader :anime, :type, :ep, :download_url
 
   include Animecrazy::Download
   include Animea::Download
@@ -49,8 +49,10 @@ class Download
     providers = (self.class.included_modules - Object.ancestors).map{|p| p.to_s.split("::").first}
     providers.each do |provider|
       begin
-        self.send("stage_from_#{provider.to_s.downcase}", ep)
-      rescue
+        self.send("stage_from_#{provider.to_s.downcase}", ep) unless self.download_url
+      rescue Exception => e
+        puts e.message
+        puts e.backtrace.join("\n")
         puts "FAIL #{provider}"
       end
     end

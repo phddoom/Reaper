@@ -5,6 +5,7 @@ module Animea
   module Download
     def stage_from_animea ep
       agent = Mechanize.new
+      @anime.send(:get_animea_series_page)
       links_page = @anime.animea_series_page.link_with(:text => /#{ep }/).click
       download_link = regex_or_user_input links_page.links_with(:text => /\.com/)
       @download_url = download_link.uri.to_s
@@ -19,7 +20,8 @@ module Animea
 
     def get_animea_series_page
       agent = Mechanize.new
-      page = agent.get "http://www.animea.net/search.html?q=#{@name.downcase.gsub(" ", "+")}"
+      url = URI.escape("http://www.animea.net/search.html?q=#{@name.downcase.gsub(" ", "+")}")
+      page = agent.get url
       url = page.search(".content .cleantable tr a").first.attributes["href"].value
       @animea_series_page = agent.get url
     end
@@ -58,10 +60,10 @@ module Animea
           page = nil
         end
       end
-      animea_index.map! do |a|
-        a.encode!('us-ascii', invalid: :replace, undef: :replace, replace: "")
+      eval "animea_index.map! do |a|
+        a.encode!('us-ascii', invalid: :replace, undef: :replace, replace: '')
         a.encode!('utf-8')
-      end
+      end" if RUBY_VERSION == "1.9.2"
       animea_index.select do |anime|
         anime.downcase.include? query.downcase if query
       end if query || type
